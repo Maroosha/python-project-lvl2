@@ -1,5 +1,8 @@
+"""Script for gendiff."""
+
 # !usr/bin/env python3
 
+from gendiff.generate_diff import generate_diff
 import argparse
 
 parser = argparse.ArgumentParser(description='Generate diff')
@@ -14,7 +17,7 @@ args = parser.parse_args()
 
 
 def main():
-    pass
+    return generate_diff(args.first_file, args.second_file)
 
 
 if '__name__' == '__main__':
