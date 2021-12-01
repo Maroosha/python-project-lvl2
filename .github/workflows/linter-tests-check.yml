@@ -16,7 +16,7 @@ jobs:
         - name: Set up Python ${{ matrix.python-version }}
           uses: actions/setup-python@v2
           with:
-            python-version: ${{ matrix.python-version }}
+            python-version: 3.8
         # make depends on poetry
         - name: Install dependencies
           run: |
@@ -32,3 +32,21 @@ jobs:
           with:
             coverageCommand: make test-coverage
             debug: true
+  coverage:
+    needs: [ test ]
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@master
+      with:
+        python-version: 3.8
+    - run: |
+       pip install poetry
+       make install
+    - uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: b74a06ed755da47919ecb48f0643ba807173cf6dff7e94bbbffce3d8fbf9a9ac
+      with:
+        coverageCommand: make test-coverage
+        debug: true
