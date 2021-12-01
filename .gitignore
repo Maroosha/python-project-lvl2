@@ -6,3 +6,4 @@ __pycache__
 .vim
 dist/
 *.swp
+coverage.xml
