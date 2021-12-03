@@ -1,9 +1,13 @@
-"""Compare two .json files with one another."""
+"""
+Compare two files with one another.
+
+Acceptable file formats: .JSON, .YAML, .YML
+"""
 
 # !/usr/bin/env python3
 
 
-import json
+from gendiff.file_parser import parse_file
 import types
 
 JSON_TO_PYTHON = types.MappingProxyType({
@@ -13,17 +17,47 @@ JSON_TO_PYTHON = types.MappingProxyType({
 })
 
 
-def get_dicts(filepath):
+def get_data_intersection(data1, data2):
     """
-    Get data from a .json file.
+    Get instersecting data from two data files.
 
     Parameters:
-        filepath: .json file path.
+        data1: data from the first file as a dict,
+        data2: data from the second file as a dict,
 
     Returns:
-        data as a dictionary.
+        dictionary with intersected data.
     """
-    return json.load(open(filepath))
+    intersection_dictionary = {}
+    keys1, keys2 = data1.keys(), data2.keys()
+    data_intersection = keys1 & keys2
+    for key in data_intersection:
+        if data1[key] == data2[key]:
+            intersection_dictionary['  ' + key] = data1[key]
+        else:
+            intersection_dictionary['- ' + key] = data1[key]  # file1
+            intersection_dictionary['+ ' + key] = data2[key]  # file2
+    return intersection_dictionary
+
+
+def get_data_difference(data1, data2, prefix):
+    """
+    Get data that differs from two data files.
+
+    Parameters:
+        data1: data from the first file as a dict,
+        data2: data from the second file as a dict,
+        prefix: '+' changed in file2; '-' removed from file2.
+
+    Returns:
+        dictionary with differing data.
+    """
+    difference_dictionary = {}
+    keys1, keys2 = data1.keys(), data2.keys()
+    data_difference = keys1 - keys2
+    for key in data_difference:
+        difference_dictionary[prefix + ' ' + key] = data1[key]
+    return difference_dictionary
 
 
 def compare_data(filepath1, filepath2):
@@ -37,43 +71,17 @@ def compare_data(filepath1, filepath2):
     Returns:
         dictionary of compared data.
     """
-    file1_data, file2_data = get_dicts(filepath1), get_dicts(filepath2)
+    file1_data, file2_data = parse_file(filepath1), parse_file(filepath2)
     difference = {}
-
-    def get_data_intersection():
-        """Get data that instersects in two .json files."""
-        file1_keys, file2_keys = file1_data.keys(), file2_data.keys()
-        keys_intersection = file1_keys & file2_keys
-        for key in keys_intersection:
-            if file1_data[key] == file2_data[key]:
-                difference['  ' + key] = file1_data[key]
-            else:
-                difference['- ' + key] = file1_data[key]  # file1
-                difference['+ ' + key] = file2_data[key]  # file2
-
-    def get_data_difference(data1, data2, prefix):
-        """
-        Get data that differs in two .json files.
-
-        Parameters:
-            data1: data from the first file as a dict,
-            data2: data from the second file as a dict,
-            prefix: '+' changed in file2; '-' removed from file2.
-        """
-        keys1, keys2 = data1.keys(), data2.keys()
-        data_difference = keys1 - keys2
-        for key in data_difference:
-            difference[prefix + ' ' + key] = data1[key]
-
-    get_data_intersection()
-    get_data_difference(file1_data, file2_data, '-')
-    get_data_difference(file2_data, file1_data, '+')
+    difference.update(get_data_intersection(file1_data, file2_data))
+    difference.update(get_data_difference(file1_data, file2_data, '-'))
+    difference.update(get_data_difference(file2_data, file1_data, '+'))
     return difference
 
 
-def get_json_style_difference_dict(filepath1, filepath2):
+def get_non_python_style_difference_dict(filepath1, filepath2):
     """
-    Change Python-style vars to JSON-style vars.
+    Change Python-style vars to JSON-/YAML-style vars.
 
     Parameters:
         filepath1: path to the first file,
@@ -100,7 +108,7 @@ def generate_diff(filepath1, filepath2):
     Returns:
         difference as a string.
     """
-    diff = get_json_style_difference_dict(filepath1, filepath2)
+    diff = get_non_python_style_difference_dict(filepath1, filepath2)
     diff_keys = list(diff.keys())
     diff_keys.sort(key=lambda x: x[0], reverse=True)  # sort by sign
     diff_keys.sort(key=lambda x: x[2])  # sort in alphabetical order
