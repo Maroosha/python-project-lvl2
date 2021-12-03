@@ -1,4 +1,4 @@
-me: linter-tests-check
+name: linter-tests-check
 
 on:
   - push
