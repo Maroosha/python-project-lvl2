@@ -8,13 +8,24 @@ Acceptable file formats: .JSON, .YAML, .YML
 
 
 from gendiff.file_parser import parse_file
-import types
+from gendiff.formatters.stylish import format_stylish
+from gendiff.formatters.formats import STYLISH
 
-JSON_TO_PYTHON = types.MappingProxyType({
-    'True': 'true',
-    'False': 'false',
-    'None': 'null',
-})
+
+def is_plain(filepath):
+    """Check if the file data is plain or nested.
+
+    Parameters:
+        filepath: path to the file.
+
+    Returns:
+        True if data is a plain dictionary, False if nested.
+    """
+    data = parse_file(filepath)
+    for _, value in data.items():
+        if isinstance(value, dict):
+            return False
+    return True
 
 
 def get_data_intersection(data1, data2):
@@ -33,7 +44,7 @@ def get_data_intersection(data1, data2):
     data_intersection = keys1 & keys2
     for key in data_intersection:
         if data1[key] == data2[key]:
-            intersection_dictionary['  ' + key] = data1[key]
+            intersection_dictionary[key] = data1[key]
         else:
             intersection_dictionary['- ' + key] = data1[key]  # file1
             intersection_dictionary['+ ' + key] = data2[key]  # file2
@@ -60,9 +71,9 @@ def get_data_difference(data1, data2, prefix):
     return difference_dictionary
 
 
-def compare_data(filepath1, filepath2):
+def compare_plain_data(data1, data2):
     """
-    Compare data from two .json files.
+    Compare data from two plain files.
 
     Parameters:
         filepath1: path to file1,
@@ -71,33 +82,74 @@ def compare_data(filepath1, filepath2):
     Returns:
         dictionary of compared data.
     """
-    file1_data, file2_data = parse_file(filepath1), parse_file(filepath2)
     difference = {}
-    difference.update(get_data_intersection(file1_data, file2_data))
-    difference.update(get_data_difference(file1_data, file2_data, '-'))
-    difference.update(get_data_difference(file2_data, file1_data, '+'))
+    difference.update(get_data_intersection(data1, data2))
+    difference.update(get_data_difference(data1, data2, '-'))
+    difference.update(get_data_difference(data2, data1, '+'))
     return difference
 
 
-def get_non_python_style_difference_dict(filepath1, filepath2):
+def compare_nested_data(data1, data2):
     """
-    Change Python-style vars to JSON-/YAML-style vars.
+    Compare data from two nested files.
 
     Parameters:
-        filepath1: path to the first file,
+        filepath1: path to the first file.
         filepath2: path to the second file.
 
     Returns:
-        difference dictionary with JSON-stule vars.
+        dictionary of compared data.
     """
-    difference = compare_data(filepath1, filepath2)
-    for key, value in difference.items():
-        if str(value) in JSON_TO_PYTHON:
-            difference[key] = JSON_TO_PYTHON[str(value)]
+    difference = {}
+    keys_union = data1.keys() | data2.keys()
+    for key in keys_union:
+        if key in data1 and key not in data2:
+            difference['- ' + key] = data1[key]
+        if key not in data1 and key in data2:
+            difference['+ ' + key] = data2[key]
+        elif key in data1 and key in data2:
+            difference.update(recurse_through_value(key, data1, data2))
     return difference
 
 
-def generate_diff(filepath1, filepath2):
+def recurse_through_value(parent, dict1, dict2):
+    """
+    Recurse though a nested dictionary.
+
+    Parameters:
+        parent: key of a dictionary.
+        dict1: subdictionary from the first file
+        dict2: subdictionary from the second file
+
+    Returns:
+        local difference.
+    """
+    local_difference = {parent: {}}
+    child1, child2 = dict1[parent], dict2[parent]
+    if not isinstance(child1, dict) or not isinstance(child2, dict):
+        parent_child1 = {parent: child1}
+        parent_child2 = {parent: child2}
+        local_difference.update(
+            compare_plain_data(parent_child1, parent_child2)
+        )
+        local_difference = {
+            k: v for k, v in local_difference.items() if v != {}
+        }
+    else:
+        intersecting_keys = child1.keys() & child2.keys()
+        xor_keys = child1.keys() ^ child2.keys()
+        for key in intersecting_keys:
+            ans = recurse_through_value(key, child1, child2)
+            local_difference[parent].update(ans)
+        for key in xor_keys:
+            if key in child1:
+                local_difference[parent].update({'- ' + key: child1[key]})
+            elif key in child2:
+                local_difference[parent].update({'+ ' + key: child2[key]})
+    return local_difference
+
+
+def generate_diff(filepath1, filepath2, formatter=STYLISH):
     """
     Generate difference btw data in file1 and file2 as a str.
 
@@ -108,11 +160,9 @@ def generate_diff(filepath1, filepath2):
     Returns:
         difference as a string.
     """
-    diff = get_non_python_style_difference_dict(filepath1, filepath2)
-    diff_keys = list(diff.keys())
-    diff_keys.sort(key=lambda x: x[0], reverse=True)  # sort by sign
-    diff_keys.sort(key=lambda x: x[2])  # sort in alphabetical order
-    answer = '{'
-    for key in diff_keys:
-        answer += f'\n  {key}: {diff[key]}'
-    return answer + '\n}'
+    data1, data2 = parse_file(filepath1), parse_file(filepath2)
+    if is_plain(filepath1) and is_plain(filepath2):
+        diff = compare_plain_data(data1, data2)
+    else:
+        diff = compare_nested_data(data1, data2)
+    return format_stylish(diff)
