@@ -3,7 +3,7 @@
 # !usr/bin/env python3
 
 from gendiff.generate_diff import generate_diff
-from gendiff.formatters.formats import STYLISH
+from gendiff.formatters.formats import STYLISH, PLAIN
 import argparse
 
 
