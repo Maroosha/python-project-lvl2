@@ -6,13 +6,14 @@ Acceptable file formats: .JSON, .YAML, .YML
 
 # !/usr/bin/env python3
 
-
 from gendiff.file_parser import parse_file
 from gendiff.formatters.stylish import format_stylish
+from gendiff.formatters.plain import format_plain
 from gendiff.formatters.formats import STYLISH
+from gendiff.formatters.formats import PLAIN
 
 
-def is_plain(filepath):
+def is_not_nested(filepath):
     """Check if the file data is plain or nested.
 
     Parameters:
@@ -161,8 +162,10 @@ def generate_diff(filepath1, filepath2, formatter=STYLISH):
         difference as a string.
     """
     data1, data2 = parse_file(filepath1), parse_file(filepath2)
-    if is_plain(filepath1) and is_plain(filepath2):
+    if is_not_nested(filepath1) and is_not_nested(filepath2):
         diff = compare_plain_data(data1, data2)
     else:
         diff = compare_nested_data(data1, data2)
+    if formatter == PLAIN:
+        return format_plain(diff)
     return format_stylish(diff)

@@ -1,1 +1,2 @@
 STYLISH = 'stylish'
+PLAIN = 'plain'
