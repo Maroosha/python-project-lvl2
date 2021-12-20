@@ -34,9 +34,7 @@ def get_almost_stylish_output(list_):
     """
     answer, index = [], 0
     while index < len(list_):
-        if list_[index] == ' ' and list_[index + 1] == '\n':
-            index += 1
-        elif list_[index] == '\n':
+        if list_[index] == '\n':
             answer.append(list_[index])
             index += 3
         else:

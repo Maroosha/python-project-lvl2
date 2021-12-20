@@ -20,7 +20,7 @@ RECURSIVE_FILE_STYLISH = '''{
         }
         setting6: {
             doge: {
-              - wow:
+              - wow: 
               + wow: so much
             }
             key: value
