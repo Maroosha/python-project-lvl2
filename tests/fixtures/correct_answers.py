@@ -51,6 +51,7 @@ RECURSIVE_FILE_STYLISH = '''{
         fee: 100500
     }
 }'''
+print(len(RECURSIVE_FILE_STYLISH))
 
 FILE_PLAIN = """Property 'follow' was removed
 Property 'proxy' was removed
