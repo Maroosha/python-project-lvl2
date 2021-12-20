@@ -4,7 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/Maroosha/python-project-lvl2/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/test_coverage)](https://codeclimate.com/github/Maroosha/python-project-lvl2/test_coverage)
 
-## Compare two plain JSON and/or YAML files
+## Compare two flat JSON and/or YAML files
 [![asciicast](https://asciinema.org/a/457543.svg)](https://asciinema.org/a/457543)
 
 ## Compare two nested JSON and/or YAML files
