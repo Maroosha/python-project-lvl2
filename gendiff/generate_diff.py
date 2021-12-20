@@ -12,14 +12,14 @@ from gendiff.formatters.stylish_formatter import format_stylish
 from gendiff.formatters.plain_formatter import format_plain
 
 
-def is_not_nested(filepath):
-    """Check if the file data is plain or nested.
+def is_flat(filepath):
+    """Check if the file data is flat or nested.
 
     Parameters:
         filepath: path to the file.
 
     Returns:
-        True if data is a plain dictionary, False if nested.
+        True if data is a flat dictionary, False if nested.
     """
     data = parse_file(filepath)
     for _, value in data.items():
@@ -71,9 +71,9 @@ def get_data_difference(data1, data2, prefix):
     return difference_dictionary
 
 
-def compare_plain_data(data1, data2):
+def compare_flat_data(data1, data2):
     """
-    Compare data from two plain files.
+    Compare data from two files with flat dicts.
 
     Parameters:
         filepath1: path to file1,
@@ -130,7 +130,7 @@ def recurse_through_value(parent, dict1, dict2):
         parent_child1 = {parent: child1}
         parent_child2 = {parent: child2}
         local_difference.update(
-            compare_plain_data(parent_child1, parent_child2)
+            compare_flat_data(parent_child1, parent_child2)
         )
         local_difference = {
             k: v for k, v in local_difference.items() if v != {}
@@ -161,8 +161,8 @@ def generate_diff(filepath1, filepath2, formatter='stylish'):
         difference as a string.
     """
     data1, data2 = parse_file(filepath1), parse_file(filepath2)
-    if is_not_nested(filepath1) and is_not_nested(filepath2):
-        diff = compare_plain_data(data1, data2)
+    if is_flat(filepath1) and is_flat(filepath2):
+        diff = compare_flat_data(data1, data2)
     else:
         diff = compare_nested_data(data1, data2)
     if formatter == 'plain':
