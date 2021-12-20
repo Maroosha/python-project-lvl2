@@ -31,4 +31,5 @@ def format_stylish(dictionary):
             answer.append(sorted_string[index])
             index += 1
     answer[-1] = '\n}'
-    return ''.join(answer)
+    string_answer = ''.join(answer)
+    return string_answer
