@@ -7,10 +7,9 @@ Acceptable file formats: .JSON, .YAML, .YML
 # !/usr/bin/env python3
 
 from gendiff.file_parser import parse_file
-from gendiff.formatters.stylish import format_stylish
-from gendiff.formatters.plain import format_plain
-from gendiff.formatters.formats import STYLISH
-from gendiff.formatters.formats import PLAIN
+from gendiff.formatters.json_formatter import format_json
+from gendiff.formatters.stylish_formatter import format_stylish
+from gendiff.formatters.plain_formatter import format_plain
 
 
 def is_not_nested(filepath):
@@ -150,7 +149,7 @@ def recurse_through_value(parent, dict1, dict2):
     return local_difference
 
 
-def generate_diff(filepath1, filepath2, formatter=STYLISH):
+def generate_diff(filepath1, filepath2, formatter='stylish'):
     """
     Generate difference btw data in file1 and file2 as a str.
 
@@ -166,6 +165,8 @@ def generate_diff(filepath1, filepath2, formatter=STYLISH):
         diff = compare_plain_data(data1, data2)
     else:
         diff = compare_nested_data(data1, data2)
-    if formatter == PLAIN:
+    if formatter == 'plain':
         return format_plain(diff)
+    if formatter == 'json':
+        return format_json(diff)
     return format_stylish(diff)

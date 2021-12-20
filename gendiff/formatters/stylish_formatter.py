@@ -18,9 +18,17 @@ def format_stylish(dictionary):
     """
     sorted_dict = get_ordered_dictionary(dictionary)
     json_dict = json.dumps(sorted_dict, indent=4, separators=('', ': '))
-    answer = [i for i in json_dict if i != '"']
-    for index, value in enumerate(answer):
+    sorted_string = [i for i in json_dict if i != '"']
+    for index, value in enumerate(sorted_string):
         if value == '}':
-            answer[index] = '  }'
-    answer[-1] = '}'
+            sorted_string[index] = '  }'
+    answer, index = [], 0
+    while index < len(sorted_string):
+        if sorted_string[index] == '\n':
+            answer.append(sorted_string[index])
+            index += 3
+        else:
+            answer.append(sorted_string[index])
+            index += 1
+    answer[-1] = '\n}'
     return ''.join(answer)
