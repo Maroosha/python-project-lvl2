@@ -8,7 +8,7 @@ from gendiff.formatters.engine import get_ordered_dictionary
 
 def format_stylish(dictionary):
     """
-    Format a dictionary into preferred output.
+    Get a dictionary in stylish format.
 
     Parameters:
         dictionary: dictionary of compared data.

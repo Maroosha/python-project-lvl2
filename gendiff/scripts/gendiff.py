@@ -2,7 +2,7 @@
 
 # !usr/bin/env python3
 
-from gendiff.generate_diff import generate_diff
+from gendiff.gendiff import generate_diff
 from gendiff.formatters.formats import JSON, STYLISH, PLAIN
 import argparse
 

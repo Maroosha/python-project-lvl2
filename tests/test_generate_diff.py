@@ -1,4 +1,4 @@
-from gendiff.generate_diff import generate_diff
+from gendiff.gendiff import generate_diff
 from gendiff.formatters.formats import JSON, STYLISH, PLAIN
 from tests.fixtures.correct_answers import FILE_STYLISH
 from tests.fixtures.correct_answers import RECURSIVE_FILE_STYLISH
