@@ -9,3 +9,6 @@
 
 ## Compare two nested JSON and/or YAML files
 [![asciicast](https://asciinema.org/a/456099.svg)](https://asciinema.org/a/456099)
+
+## Print out the plain difference between two JSON/YAML files
+[![asciicast](https://asciinema.org/a/457511.svg)](https://asciinema.org/a/457511)
