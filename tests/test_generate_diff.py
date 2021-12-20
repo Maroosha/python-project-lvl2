@@ -6,6 +6,11 @@ from tests.fixtures.correct_answers import FILE_PLAIN
 from tests.fixtures.correct_answers import RECURSIVE_FILE_PLAIN
 from tests.fixtures.correct_answers import FILE_JSON
 from tests.fixtures.correct_answers import RECURSIVE_FILE_JSON
+import typing
+
+
+def test_gendif_type():
+    assert isinstance(generate_diff, typing.Callable)
 
 
 def test_generate_diff_stylish():
