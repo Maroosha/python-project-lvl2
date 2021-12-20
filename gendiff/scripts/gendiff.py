@@ -18,11 +18,11 @@ def main():
         help='set format of output (default: stylish)'
     )
     args = parser.parse_args()
-    print(generate_diff(
+    return generate_diff(
         args.first_file,
         args.second_file,
         args.format,
-    ))
+    )
 
 
 if '__name__' == '__main__':
