@@ -35,7 +35,7 @@ def convert_keyword(value):
     """
     if str(value) in KEYWORDS_CONVERSION:
         return KEYWORDS_CONVERSION[str(value)]
-    return f'\'{value}\''
+    return f'\'{value}\'' if isinstance(value, str) else value
 
 
 def get_status_dict(dictionary):

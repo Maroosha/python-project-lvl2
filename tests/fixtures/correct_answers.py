@@ -54,7 +54,7 @@ RECURSIVE_FILE_STYLISH = '''{
 
 FILE_PLAIN = """Property 'follow' was removed
 Property 'proxy' was removed
-Property 'timeout' was updated. From '50' to '20'
+Property 'timeout' was updated. From 50 to 20
 Property 'verbose' was added with value: true"""
 
 RECURSIVE_FILE_PLAIN = """Property 'common.follow' was added with value: false
