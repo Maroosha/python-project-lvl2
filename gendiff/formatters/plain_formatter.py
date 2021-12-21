@@ -35,12 +35,13 @@ def convert_keyword(value):
     """
     if str(value) in KEYWORDS_CONVERSION:
         return KEYWORDS_CONVERSION[str(value)]
-    return f'\'{value}\'' if isinstance(value, str) else value
+    return f"'{value}'" if isinstance(value, str) else value
 
 
 def get_status_dict(dictionary):
     """
-    Get a dict of dictionary keys statuses.
+    Get a status dictionary.
+    Status dictionary is dictionary of keys statuses.
 
     Parameters:
         dictionary: check keys of this dictionary.
@@ -48,23 +49,37 @@ def get_status_dict(dictionary):
     Returns:
         dictionary of keys statuses:
         'not updated': key-value pair not updated,
-        'updated': key-value pair updated
+        'updated': key-value pair updated,
         'added': key-value pair added,
         'removed': key-value pair removed.
     """
     status_dict = OrderedDict()
     for key in dictionary:
-        if key.startswith('  '):
-            status_dict[key[2:]] = 'not updated'
-        elif key.startswith('- ') and key[2:] in status_dict:
-            status_dict[key[2:]] = 'updated'
-        elif key.startswith('+ ') and key[2:] in status_dict:
-            status_dict[key[2:]] = 'updated'
-        elif key.startswith('- ') and key[2:] not in status_dict:
-            status_dict[key[2:]] = 'removed'
-        else:
-            status_dict[key[2:]] = 'added'
+        status_key, status_value = update_status_dict(key, status_dict)
+        status_dict.update({status_key: status_value})
     return status_dict
+
+
+def update_status_dict(key, status_dictionary):
+    """
+    Update a status dictionary.
+
+    Parameters:
+        key: key to be checked,
+        status dictionary: status dictionary.
+
+    Returns:
+        new key-value pair for the status dictionary.
+    """
+    if key.startswith('  '):
+        return key[2:], 'not updated'
+    if key.startswith('- ') and key[2:] in status_dictionary:
+        return key[2:], 'updated'
+    if key.startswith('+ ') and key[2:] in status_dictionary:
+        return key[2:], 'updated'
+    if key.startswith('- ') and key[2:] not in status_dictionary:
+        return key[2:], 'removed'
+    return key[2:], 'added'
 
 
 def get_message(dictionary, key, status, path):
@@ -86,8 +101,8 @@ def get_message(dictionary, key, status, path):
         return f"Property '{path}' was updated. From {old_value} to {new_value}"
     if status == 'added':
         new_value = check_value_complexity(dictionary['+ ' + key])
-        return f'Property \'{path}\' was added with value: {new_value}'
-    return f'Property \'{path}\' was removed'
+        return f"Property '{path}' was added with value: {new_value}"
+    return f"Property '{path}' was removed"
 
 
 def format_plain(difference):
