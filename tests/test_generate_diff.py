@@ -19,7 +19,7 @@ ANSWER_JSON_NESTED = 'tests/fixtures/answer_json_nested'
 ANSWER_PLAIN_FLAT = 'tests/fixtures/answer_plain_flat'
 ANSWER_PLAIN_NESTED = 'tests/fixtures/answer_plain_nested'
 ANSWER_STYLISH_FLAT = 'tests/fixtures/answer_stylish_flat'
-ANSWER_STYLISH_NESTED = 'tests/fixtures/answer_stylish_NESTED'
+ANSWER_STYLISH_NESTED = 'tests/fixtures/answer_stylish_nested'
 
 
 def test_gendif_type():
