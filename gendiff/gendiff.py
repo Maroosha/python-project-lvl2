@@ -6,7 +6,7 @@ Acceptable file formats: .JSON, .YAML, .YML
 
 # !/usr/bin/env python3
 
-from gendiff.file_parser import parse_file
+from gendiff.file_parser import get_raw_data, parse_file
 from gendiff.formatters.json_formatter import format_json
 from gendiff.formatters.stylish_formatter import format_stylish
 from gendiff.formatters.plain_formatter import format_plain
@@ -21,7 +21,7 @@ def is_flat(filepath):
     Returns:
         True if data is a flat dictionary, False if nested.
     """
-    data = parse_file(filepath)
+    data = parse_file(filepath, get_raw_data(filepath))
     for _, value in data.items():
         if isinstance(value, dict):
             return False
@@ -160,7 +160,8 @@ def generate_diff(filepath1, filepath2, formatter='stylish'):
     Returns:
         difference as a string.
     """
-    data1, data2 = parse_file(filepath1), parse_file(filepath2)
+    data1 = parse_file(filepath1, get_raw_data(filepath1))
+    data2 = parse_file(filepath2, get_raw_data(filepath2))
     if is_flat(filepath1) and is_flat(filepath2):
         diff = compare_flat_data(data1, data2)
     else:
