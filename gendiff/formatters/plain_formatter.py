@@ -3,13 +3,14 @@
 # !usr/bin/env/python3
 
 from gendiff.formatters.keywords import KEYWORDS_CONVERSION
+import types
 
 
-LOG_MESSAGES = {
+LOG_MESSAGES = types.MappingProxyType({
     'added': "Property '{path}' was added with value: {new_value}",
     'removed': "Property '{path}' was removed",
     'changed': "Property '{path}' was updated. From {old_value} to {new_value}",
-}
+})
 
 
 def check_value_complexity(value):
