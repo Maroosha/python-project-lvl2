@@ -60,29 +60,40 @@ def get_path(parent, key):
     return f'{key}'
 
 
-def get_message(status, path, old_value, new_value):
+def get_logline(status_dict, value, status, path):
     """
-    Get a log message.
+    Get a logline.
 
     Parameters:
+        status_dict: dictionary of statuses and values
+        for a current (sub)dict,
+        value: given value,
         status: status of a key-value pair,
-        path: path to the parameter (key),
-        old_value: old value if any,
-        new_value: new value if any.
+        path: path to the parameter (key).
 
     Returns:
-        log message as a string.
+        logline as a list with a single string.
     """
+    log_line = []
     if status == 'changed':
-        return LOG_MESSAGES[status].format(
+        old_value = check_value_complexity(value.get('old value'))
+        new_value = check_value_complexity(value.get('new value'))
+        message = LOG_MESSAGES[status].format(
             path=path,
             old_value=old_value,
             new_value=new_value,
         )
-    if status == 'added':
-        return LOG_MESSAGES[status].format(path=path, new_value=new_value)
-    if status == 'removed':
-        return LOG_MESSAGES[status].format(path=path)
+        log_line.append(message)
+    elif status == 'added':
+        new_value = check_value_complexity(status_dict.get('value'))
+        message = LOG_MESSAGES[status].format(path=path, new_value=new_value)
+        log_line.append(message)
+    elif status == 'removed':
+        message = LOG_MESSAGES[status].format(path=path)
+        log_line.append(message)
+    elif status == 'nested':
+        log_line.append(format_plain(value, path))
+    return log_line
 
 
 def format_plain(diff, parent=None):
@@ -100,18 +111,6 @@ def format_plain(diff, parent=None):
         path = get_path(parent, key)
         status = status_dict.get('status')
         value = status_dict.get('value')
-        if status == 'changed':
-            old_value = check_value_complexity(value.get('old value'))
-            new_value = check_value_complexity(value.get('new value'))
-            message = get_message(status, path, old_value, new_value)
-            log.append(message)
-        elif status == 'added':
-            new_value = check_value_complexity(status_dict.get('value'))
-            message = get_message(status, path, None, new_value)
-            log.append(message)
-        elif status == 'removed':
-            message = get_message(status, path, None, None)
-            log.append(message)
-        elif status == 'nested':
-            log.append(format_plain(value, path))
+        logline = get_logline(status_dict, value, status, path)
+        log.extend(logline)
     return '\n'.join(log)
