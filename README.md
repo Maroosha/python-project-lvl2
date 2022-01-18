@@ -14,4 +14,4 @@
 [![asciicast](https://asciinema.org/a/457745.svg)](https://asciinema.org/a/457745)
 
 ## Compare two JSON and/or YAML files: json format
-[![asciicast](https://asciinema.org/a/457747.svg)](https://asciinema.org/a/457747)
+[![asciicast](https://asciinema.org/a/462330.svg)](https://asciinema.org/a/462330)

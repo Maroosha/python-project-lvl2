@@ -1,15 +1,20 @@
-"""Formatter for comparing two files."""
+"""Plain formatter for comparing two files."""
 
 # !usr/bin/env/python3
 
-from collections import OrderedDict
-from gendiff.formatters.engine import get_ordered_dictionary
-from gendiff.formatters.engine import KEYWORDS_CONVERSION
+from gendiff.formatters.keywords import KEYWORDS_CONVERSION
+
+
+LOG_MESSAGES = {
+    'added': "Property '{path}' was added with value: {new_value}",
+    'removed': "Property '{path}' was removed",
+    'changed': "Property '{path}' was updated. From {old_value} to {new_value}",
+}
 
 
 def check_value_complexity(value):
     """
-    Check whether value is complex.
+    Check whether a value is complex.
 
     Parameters:
         value: value to be checked.
@@ -38,106 +43,74 @@ def convert_keyword(value):
     return f"'{value}'" if isinstance(value, str) else value
 
 
-def get_status_dict(dictionary):
+def get_path(parent, key):
     """
-    Get a status dictionary.
-    Status dictionary is dictionary of keys statuses.
+    Get a log path for a given parameter.
 
     Parameters:
-        dictionary: check keys of this dictionary.
+        parent: parameter name at a higher nesting lvl,
+        key: parameter name.
 
     Returns:
-        dictionary of keys statuses:
-        'not updated': key-value pair not updated,
-        'updated': key-value pair updated,
-        'added': key-value pair added,
-        'removed': key-value pair removed.
+        path as a str.
     """
-    status_dict = OrderedDict()
-    for key in dictionary:
-        status_key, status_value = update_status_dict(key, status_dict)
-        status_dict.update({status_key: status_value})
-    return status_dict
+    if parent:
+        return parent + f'.{key}'
+    return f'{key}'
 
 
-def update_status_dict(key, status_dictionary):
-    """
-    Update a status dictionary.
-
-    Parameters:
-        key: key to be checked,
-        status dictionary: status dictionary.
-
-    Returns:
-        new key-value pair for the status dictionary.
-    """
-    if key.startswith('  '):
-        return key[2:], 'not updated'
-    if key.startswith('- ') and key[2:] in status_dictionary:
-        return key[2:], 'updated'
-    if key.startswith('+ ') and key[2:] in status_dictionary:
-        return key[2:], 'updated'
-    if key.startswith('- ') and key[2:] not in status_dictionary:
-        return key[2:], 'removed'
-    return key[2:], 'added'
-
-
-def get_message(dictionary, key, status, path):
+def get_message(status, path, old_value, new_value):
     """
     Get a log message.
 
     Parameters:
-        dictionary: sorted difference dictionary,
-        key: key of a dictionary
-        status: status of a key in a dictionary,
-        path: path to a value.
+        status: status of a key-value pair,
+        path: path to the parameter (key),
+        old_value: old value if any,
+        new_value: new value if any.
 
     Returns:
-        log message.
+        log message as a string.
     """
-    if status == 'updated':
-        old_value = check_value_complexity(dictionary['- ' + key])
-        new_value = check_value_complexity(dictionary['+ ' + key])
-        return f"Property '{path}' was updated. From {old_value} to {new_value}"
+    if status == 'changed':
+        return LOG_MESSAGES[status].format(
+            path=path,
+            old_value=old_value,
+            new_value=new_value,
+        )
     if status == 'added':
-        new_value = check_value_complexity(dictionary['+ ' + key])
-        return f"Property '{path}' was added with value: {new_value}"
-    return f"Property '{path}' was removed"
+        return LOG_MESSAGES[status].format(path=path, new_value=new_value)
+    if status == 'removed':
+        return LOG_MESSAGES[status].format(path=path)
 
 
-def format_plain(difference):
+def format_plain(diff, parent=None):
     """
     Introduce output in plain format.
 
     Parameters:
-        difference: dictionary of differences btw two files.
+        diff: dictionary of differences btw two files.
 
     Returns:
         difference in plain format.
     """
-    sorted_dict = get_ordered_dictionary(difference)
     log = []
-
-    def walk(dictionary, path=''):
-        """
-        Walk through status dictionary.
-
-        Parameters:
-            dictionary: sorted dictionary,
-            path: path to the given key.
-        """
-        status_dict = get_status_dict(dictionary)
-        for key, value in status_dict.items():
-            path += f'{key}'
-            if value == 'not updated':
-                if isinstance(dictionary['  ' + key], dict):
-                    walk(dictionary['  ' + key], path + '.')
-                path = path[:-len(key)]  # do nothing
-            else:
-                status = value
-                message = get_message(dictionary, key, status, path)
-                log.append(message)
-                path = path[:-len(key)]
-
-    walk(sorted_dict)
+    for key, status_dict in diff.items():
+        path = get_path(parent, key)
+        status = status_dict.get('status')
+        value = status_dict.get('value')
+        if status == 'changed':
+            old_value = check_value_complexity(value.get('old value'))
+            new_value = check_value_complexity(value.get('new value'))
+            message = get_message(status, path, old_value, new_value)
+            log.append(message)
+        elif status == 'added':
+            new_value = check_value_complexity(status_dict.get('value'))
+            message = get_message(status, path, None, new_value)
+            log.append(message)
+        elif status == 'removed':
+            message = get_message(status, path, None, None)
+            log.append(message)
+        elif status == 'nested':
+            log.append(format_plain(value, path))
     return '\n'.join(log)

@@ -19,7 +19,7 @@ test-coverage:
 selfcheck:
 	poetry check
 
-check: selfcheck lint
+check: selfcheck test lint
 
 build: check
 	poetry build
