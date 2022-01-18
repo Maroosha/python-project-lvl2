@@ -62,6 +62,40 @@ def get_data_difference(data1, data2):
     return list(data1.keys() - data2.keys())
 
 
+def get_local_difference_pair(key, value1, value2):
+    """
+    Get a key-value pair for the local_difference dict.
+
+    Parameters:
+        key: key from data1 and data2,
+        value1: value from data1,
+        value2: value from data2.
+
+    Returns:
+        local_difference dict with a single key-value pair.
+    """
+    local_difference_pair = {}
+    if isinstance(value1, Dict) and isinstance(value2, Dict):
+        local_difference_pair[key] = {
+            'status': 'nested',
+            'value': compare_data(value1, value2),
+        }
+    elif value1 == value2:
+        local_difference_pair[key] = {
+            'status': 'unchanged',
+            'value': value1,
+        }
+    else:
+        local_difference_pair[key] = {
+            'status': 'changed',
+            'value': {
+                'old value': value1,
+                'new value': value2,
+            },
+        }
+    return local_difference_pair
+
+
 def analyze_interseting_keys(intersecting_keys, data1, data2):
     """
     Build a status dictionary for intersecting keys.
@@ -78,24 +112,12 @@ def analyze_interseting_keys(intersecting_keys, data1, data2):
     for key in intersecting_keys:
         value1 = data1.get(key)
         value2 = data2.get(key)
-        if isinstance(value1, Dict) and isinstance(value2, Dict):
-            local_difference[key] = {
-                'status': 'nested',
-                'value': compare_data(value1, value2),
-            }
-        elif value1 == value2:
-            local_difference[key] = {
-                'status': 'unchanged',
-                'value': value1,
-            }
-        else:
-            local_difference[key] = {
-                'status': 'changed',
-                'value': {
-                    'old value': value1,
-                    'new value': value2,
-                },
-            }
+        local_difference_pair = get_local_difference_pair(
+            key,
+            value1,
+            value2,
+        )
+        local_difference.update(local_difference_pair)
     return local_difference
 
 
