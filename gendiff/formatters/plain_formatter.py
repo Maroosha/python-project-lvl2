@@ -60,38 +60,38 @@ def get_path(parent, key):
     return f'{key}'
 
 
-def get_logline(status_dict, value, status, path):
+def get_logline(status_dict, value, type_, path):
     """
     Get a logline.
 
     Parameters:
-        status_dict: dictionary of statuses and values
+        status_dict: dictionary of types and values
         for a current (sub)dict,
         value: given value,
-        status: status of a key-value pair,
+        type_: type of a key-value pair,
         path: path to the parameter (key).
 
     Returns:
         logline as a list with a single string.
     """
     log_line = []
-    if status == 'changed':
+    if type_ == 'changed':
         old_value = check_value_complexity(value.get('old value'))
         new_value = check_value_complexity(value.get('new value'))
-        message = LOG_MESSAGES[status].format(
+        message = LOG_MESSAGES[type_].format(
             path=path,
             old_value=old_value,
             new_value=new_value,
         )
         log_line.append(message)
-    elif status == 'added':
+    elif type_ == 'added':
         new_value = check_value_complexity(status_dict.get('value'))
-        message = LOG_MESSAGES[status].format(path=path, new_value=new_value)
+        message = LOG_MESSAGES[type_].format(path=path, new_value=new_value)
         log_line.append(message)
-    elif status == 'removed':
-        message = LOG_MESSAGES[status].format(path=path)
+    elif type_ == 'removed':
+        message = LOG_MESSAGES[type_].format(path=path)
         log_line.append(message)
-    elif status == 'nested':
+    elif type_ == 'nested':
         log_line.append(format_plain(value, path))
     return log_line
 
@@ -109,8 +109,8 @@ def format_plain(diff, parent=None):
     log = []
     for key, status_dict in diff.items():
         path = get_path(parent, key)
-        status = status_dict.get('status')
+        type_ = status_dict.get('type')
         value = status_dict.get('value')
-        logline = get_logline(status_dict, value, status, path)
+        logline = get_logline(status_dict, value, type_, path)
         log.extend(logline)
     return '\n'.join(log)

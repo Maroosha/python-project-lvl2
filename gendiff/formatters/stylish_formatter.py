@@ -70,14 +70,14 @@ def get_almost_stylish_output(diff, diff_depth):
     output = []
     tab = INDENT * diff_depth
     for key, status_dict in diff.items():
-        status = status_dict.get('status')
+        type_ = status_dict.get('type')
         value = status_dict.get('value')
-        if status == 'nested':
+        if type_ == 'nested':
             output_key = f'{tab}{INDENT}{key}: '\
                 f'{{\n{get_almost_stylish_output(value, diff_depth+1)}'
             output_value = f'{tab}{INDENT}}}'
             output.extend([output_key, output_value])
-        elif status == 'changed':
+        elif type_ == 'changed':
             old_value = value.get('old value')
             new_value = value.get('new value')
             output_key = f'{tab}{STATUS_KEYSWORDS["removed"]}{key}: '\
@@ -86,7 +86,7 @@ def get_almost_stylish_output(diff, diff_depth):
                 f'{get_lines(new_value, diff_depth+1)}'
             output.extend([output_key, output_value])
         else:  # unchanged
-            output_line = f'{tab}{STATUS_KEYSWORDS[status]}{key}: '\
+            output_line = f'{tab}{STATUS_KEYSWORDS[type_]}{key}: '\
                 f'{get_lines(value, diff_depth+1)}'
             output.append(output_line)
     return '\n'.join(output)

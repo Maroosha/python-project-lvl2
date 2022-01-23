@@ -7,20 +7,20 @@ Acceptable file formats: .JSON, .YAML, .YML
 # !/usr/bin/env python3
 
 from typing import Dict, OrderedDict
-from gendiff.file_parser import get_raw_data, parse_file
+from gendiff.data_parser import get_raw_data, parse_file
 from gendiff.formatters.json_formatter import format_json
 from gendiff.formatters.stylish_formatter import format_stylish
 from gendiff.formatters.plain_formatter import format_plain
 
 
-def get_status_dictionary(keys, data, status):
+def get_status_dictionary(keys, data, type_):
     """
     Get a dictionary of statuses for a current (sub)dict.
 
     Parameters:
         keys: keys of a dict,
         data: data from a file,
-        status: status of a key-value pair.
+        type_: type of a key-value pair.
 
     Returns:
         status dictionary.
@@ -28,7 +28,7 @@ def get_status_dictionary(keys, data, status):
     status_dictionary = {}
     for key in keys:
         status_dictionary[key] = {
-            'status': status,
+            'type': type_,
             'value': data.get(key),
         }
     return status_dictionary
@@ -77,17 +77,17 @@ def get_local_difference_pair(key, value1, value2):
     local_difference_pair = {}
     if isinstance(value1, Dict) and isinstance(value2, Dict):
         local_difference_pair[key] = {
-            'status': 'nested',
+            'type': 'nested',
             'value': compare_data(value1, value2),
         }
     elif value1 == value2:
         local_difference_pair[key] = {
-            'status': 'unchanged',
+            'type': 'unchanged',
             'value': value1,
         }
     else:
         local_difference_pair[key] = {
-            'status': 'changed',
+            'type': 'changed',
             'value': {
                 'old value': value1,
                 'new value': value2,
@@ -96,7 +96,7 @@ def get_local_difference_pair(key, value1, value2):
     return local_difference_pair
 
 
-def analyze_interseting_keys(intersecting_keys, data1, data2):
+def analyze_intersecting_keys(intersecting_keys, data1, data2):
     """
     Build a status dictionary for intersecting keys.
 
@@ -137,7 +137,7 @@ def compare_data(data1, data2):
     added_keys = get_data_difference(data2, data1)
     removed_keys = get_data_difference(data1, data2)
 
-    intersection_statuses = analyze_interseting_keys(
+    intersection_statuses = analyze_intersecting_keys(
         intersecting_keys,
         data1,
         data2,
