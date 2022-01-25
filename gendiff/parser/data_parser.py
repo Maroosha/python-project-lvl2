@@ -1,7 +1,5 @@
 """
-Parse a file.
-
-Acceptable file formats: .JSON, .YAML, .YML
+Parse data.
 """
 
 # !/usr/bin/env python3
@@ -9,20 +7,6 @@ Acceptable file formats: .JSON, .YAML, .YML
 
 import json
 import yaml
-
-
-def get_raw_data(filepath):
-    """
-    Get raw data from a file.
-
-    Parameters:
-        filepath: path to file.
-
-    Returns:
-        raw data.
-    """
-    with open(filepath) as file:
-        return file.read()
 
 
 def parse(raw_data, format_):

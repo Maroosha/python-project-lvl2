@@ -7,170 +7,58 @@ Acceptable file formats: .JSON, .YAML, .YML
 # !/usr/bin/env python3
 
 from typing import Dict, OrderedDict
-from gendiff.data_parser import get_raw_data, parse
+from gendiff.parser.data_parser import parse
+from gendiff.parser.file_reader import get_raw_data, get_format
 from gendiff.formatters.json_formatter import format_json
 from gendiff.formatters.stylish_formatter import format_stylish
 from gendiff.formatters.plain_formatter import format_plain
 
 
-def get_format(filepath):
-    """
-    Get file format (JSON or YAML).
-
-    Parameters:
-        filepath: path to the file.
-
-    Returns:
-        file format as a string.
-    """
-    return 'JSON' if filepath[-5:].upper() == '.JSON' else 'YAML'
-
-
-def get_status_dictionary(keys, data, type_):
-    """
-    Get a dictionary of statuses for a current (sub)dict.
-
-    Parameters:
-        keys: keys of a dict,
-        data: data from a file,
-        type_: type of a key-value pair.
-
-    Returns:
-        status dictionary.
-    """
-    status_dictionary = {}
-    for key in keys:
-        status_dictionary[key] = {
-            'type': type_,
-            'value': data.get(key),
-        }
-    return status_dictionary
-
-
-def get_data_intersection(data1, data2):
-    """
-    Get instersecting data from two data files.
-
-    Parameters:
-        data1: data from the first file as a dict,
-        data2: data from the second file as a dict.
-
-    Returns:
-        list of intersected keys.
-    """
-    return list(data1.keys() & data2.keys())
-
-
-def get_data_difference(data1, data2):
-    """
-    Get data that differs between two data files.
-
-    Parameters:
-        data1: data from the first file as a dict,
-        data2: data from the second file as a dict.
-
-    Returns:
-        list of differing keys.
-    """
-    return list(data1.keys() - data2.keys())
-
-
-def get_local_difference_pair(key, value1, value2):
-    """
-    Get a key-value pair for the local_difference dict.
-
-    Parameters:
-        key: key from data1 and data2,
-        value1: value from data1,
-        value2: value from data2.
-
-    Returns:
-        local_difference dict with a single key-value pair.
-    """
-    local_difference_pair = {}
-    if isinstance(value1, Dict) and isinstance(value2, Dict):
-        local_difference_pair[key] = {
-            'type': 'nested',
-            'value': compare_data(value1, value2),
-        }
-    elif value1 == value2:
-        local_difference_pair[key] = {
-            'type': 'unchanged',
-            'value': value1,
-        }
-    else:
-        local_difference_pair[key] = {
-            'type': 'changed',
-            'value': {
-                'old value': value1,
-                'new value': value2,
-            },
-        }
-    return local_difference_pair
-
-
-def analyze_intersecting_keys(intersecting_keys, data1, data2):
-    """
-    Build a status dictionary for intersecting keys.
-
-    Parameters:
-        intersecting keys: keys that intersect in data1 & data2,
-        data1: data from the first file,
-        data2: data from the second file.
-
-    Returns:
-       status dict for intersecting keys.
-    """
-    local_difference = {}
-    for key in intersecting_keys:
-        value1 = data1.get(key)
-        value2 = data2.get(key)
-        local_difference_pair = get_local_difference_pair(
-            key,
-            value1,
-            value2,
-        )
-        local_difference.update(local_difference_pair)
-    return local_difference
-
-
-def compare_data(data1, data2):
+def get_compared_data(data1, data2):
     """
     Compare data from two files.
 
     Parameters:
         data1: data from the first file,
-        data2: data from the second file.
+        data2: data from the second file
+        (both are represented as dicts).
 
     Returns:
         ordered dict of compared data.
     """
-    difference_dictionary = {}
-    intersecting_keys = get_data_intersection(data1, data2)
-    added_keys = get_data_difference(data2, data1)
-    removed_keys = get_data_difference(data1, data2)
-
-    intersection_statuses = analyze_intersecting_keys(
-        intersecting_keys,
-        data1,
-        data2,
-    )
-    added_keys_statuses = get_status_dictionary(
-        added_keys,
-        data2,
-        'added',
-    )
-    removed_keys_statuses = get_status_dictionary(
-        removed_keys,
-        data1,
-        'removed',
-    )
-
-    difference_dictionary.update(added_keys_statuses)
-    difference_dictionary.update(removed_keys_statuses)
-    difference_dictionary.update(intersection_statuses)
-
-    return OrderedDict(sorted(difference_dictionary.items()))
+    data_difference = OrderedDict()
+    keys1, keys2 = set(data1.keys()), set(data2.keys())
+    key_union = sorted(keys1 | keys2)  # now it's a list!!
+    for key in key_union:
+        if key not in data1 and key in data2:
+            data_difference[key] = {
+                'type': 'added',
+                'value': data2[key],
+            }
+        elif key in data1 and key not in data2:
+            data_difference[key] = {
+                'type': 'removed',
+                'value': data1[key],
+            }
+        elif isinstance(data1[key], Dict) and isinstance(data2[key], Dict):
+            data_difference[key] = {
+                'type': 'nested',
+                'value': get_compared_data(data1[key], data2[key]),
+            }
+        elif data1[key] == data2[key]:
+            data_difference[key] = {
+                'type': 'unchanged',
+                'value': data1[key],
+            }
+        else:
+            data_difference[key] = {
+                'type': 'changed',
+                'value': {
+                    'old value': data1[key],
+                    'new value': data2[key],
+                },
+            }
+    return data_difference
 
 
 def generate_diff(filepath1, filepath2, formatter='stylish'):
@@ -188,7 +76,7 @@ def generate_diff(filepath1, filepath2, formatter='stylish'):
     format2 = get_format(filepath2)
     data1 = parse(get_raw_data(filepath1), format1)
     data2 = parse(get_raw_data(filepath2), format2)
-    diff = compare_data(data1, data2)
+    diff = get_compared_data(data1, data2)
     if formatter == 'plain':
         return format_plain(diff)
     if formatter == 'json':
