@@ -11,7 +11,7 @@ import yaml
 
 def parse(raw_data, format_):
     """
-    Parse a file.
+    Parse data.
 
     Parameters:
         file_data: raw data from the file,
