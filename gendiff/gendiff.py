@@ -7,10 +7,23 @@ Acceptable file formats: .JSON, .YAML, .YML
 # !/usr/bin/env python3
 
 from typing import Dict, OrderedDict
-from gendiff.data_parser import get_raw_data, parse_file
+from gendiff.data_parser import get_raw_data, parse
 from gendiff.formatters.json_formatter import format_json
 from gendiff.formatters.stylish_formatter import format_stylish
 from gendiff.formatters.plain_formatter import format_plain
+
+
+def get_format(filepath):
+    """
+    Get file format (JSON or YAML).
+
+    Parameters:
+        filepath: path to the file.
+
+    Returns:
+        file format as a string.
+    """
+    return 'JSON' if filepath[-5:].upper() == '.JSON' else 'YAML'
 
 
 def get_status_dictionary(keys, data, type_):
@@ -171,8 +184,10 @@ def generate_diff(filepath1, filepath2, formatter='stylish'):
     Returns:
         difference as a string.
     """
-    data1 = parse_file(filepath1, get_raw_data(filepath1))
-    data2 = parse_file(filepath2, get_raw_data(filepath2))
+    format1 = get_format(filepath1)
+    format2 = get_format(filepath2)
+    data1 = parse(get_raw_data(filepath1), format1)
+    data2 = parse(get_raw_data(filepath2), format2)
     diff = compare_data(data1, data2)
     if formatter == 'plain':
         return format_plain(diff)

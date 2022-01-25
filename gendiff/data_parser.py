@@ -25,20 +25,20 @@ def get_raw_data(filepath):
         return file.read()
 
 
-def parse_file(filepath, file_data):
+def parse(raw_data, format_):
     """
     Parse a file.
 
     Parameters:
-        filepath: path to the file.
-        file_data: raw data from the file.
+        file_data: raw data from the file,
+        format_: file format.
 
     Returns:
         data as a dictionary if file format is correct;
         Exception if file format is invalid.
     """
-    if filepath[-5:].upper() == '.JSON':
-        return json.loads(file_data)
-    if filepath[-4:].upper() == '.YML' or filepath[-5:].upper() == '.YAML':
-        return yaml.safe_load(file_data)
+    if format_ == 'JSON':
+        return json.loads(raw_data)
+    if format_ == 'YAML':
+        return yaml.safe_load(raw_data)
     raise Exception('Invalid file format.')
