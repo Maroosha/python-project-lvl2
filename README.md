@@ -33,9 +33,9 @@ Data difference description keys:
 
 <strong>PLAIN</strong>
 
-<code>gendiff -f plain path/to/file1 path/to/file2</code>
-
 A plain descriptive format with only changed key-value pairs reflected:
+
+<code>gendiff -f plain path/to/file1 path/to/file2</code>
 
 _Property "SomeProperty" was removed_
 
@@ -47,9 +47,9 @@ If a value is a dictionary, it is displayed as "[complex value]".
 
 <strong>JSON</strong>
 
-<code>gendiff -f json path/to/file1 path/to/file2</code>
-
 A usual json format.
+
+<code>gendiff -f json path/to/file1 path/to/file2</code>
 
 
 <h3> Installation</h3>
