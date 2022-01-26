@@ -43,7 +43,7 @@ _Property "SomeProperty" was added with value: "SomeValue"_
 
 _Property "SomeProperty" was updated. From Value1 to Value2_
 
-If value is a disctionary, it is displayed as "[complex value]".
+If a value is a dictionary, it is displayed as "[complex value]".
 
 <strong>JSON</strong>
 
@@ -58,8 +58,8 @@ A usual json format.
 
 <h3> Help and usage</h3>
 
-
 <code>gendiff -h</code>
+
 <code>gendiff --format path/to/file1 path/to/file2</code>
 
 
