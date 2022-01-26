@@ -24,7 +24,7 @@ def get_compared_data(data1, data2):
         (both are represented as dicts).
 
     Returns:
-        ordered dict of compared data.
+        dictionary of compared data.
         Structure of a difference pair:
         {
             type: nested/changed/unchanged/added/removed,
