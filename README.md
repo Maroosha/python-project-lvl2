@@ -33,7 +33,7 @@ Data difference description keys:
 
 <strong>PLAIN</strong>
 
-A plain descriptive format with only changed key-value pairs reflected:
+A plain descriptive format with only changed key-value pairs shown.
 
 <code>gendiff -f plain path/to/file1 path/to/file2</code>
 
