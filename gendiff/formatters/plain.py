@@ -92,19 +92,19 @@ def get_logline(status_dict, value, type_, path):
         message = LOG_MESSAGES[type_].format(path=path)
         log_line.append(message)
     elif type_ == 'nested':
-        log_line.append(format_plain(value, path))
+        log_line.append(get_log(value, path))
     return log_line
 
 
-def format_plain(diff, parent=None):
+def get_log(diff, parent):
     """
-    Introduce output in plain format.
+    Get a log of messages for plain representation.
 
     Parameters:
         diff: dictionary of differences btw two files.
 
     Returns:
-        difference in plain format.
+        log for plain representation.
     """
     log = []
     for key, status_dict in diff.items():
@@ -114,3 +114,16 @@ def format_plain(diff, parent=None):
         logline = get_logline(status_dict, value, type_, path)
         log.extend(logline)
     return '\n'.join(log)
+
+
+def format_plain(diff):
+    """
+    Introduce output in plain format.
+
+    Parameters:
+        diff: dictionary of differences btw two files.
+
+    Returns:
+        difference in plain format.
+    """
+    return get_log(diff, parent='')
