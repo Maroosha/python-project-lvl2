@@ -9,9 +9,9 @@ Acceptable file formats: .JSON, .YAML, .YML
 from typing import Dict
 from gendiff.parser.data_parser import parse
 from gendiff.parser.file_reader import get_raw_data, get_format
-from gendiff.formatters.json_formatter import format_json
-from gendiff.formatters.stylish_formatter import format_stylish
-from gendiff.formatters.plain_formatter import format_plain
+from gendiff.formatters.json import format_json
+from gendiff.formatters.stylish import format_stylish
+from gendiff.formatters.plain import format_plain
 
 
 def get_compared_data(data1, data2):
