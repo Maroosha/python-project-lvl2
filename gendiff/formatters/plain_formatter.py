@@ -2,7 +2,7 @@
 
 # !usr/bin/env/python3
 
-from gendiff.formatters.keywords import KEYWORDS_CONVERSION
+import json
 import types
 
 
@@ -26,10 +26,10 @@ def check_value_complexity(value):
     """
     if isinstance(value, dict):
         return '[complex value]'
-    return convert_keyword(value)
+    return stringify_value(value)
 
 
-def convert_keyword(value):
+def stringify_value(value):
     """
     Convert a value from Python- to JSON/YAML-style.
 
@@ -39,8 +39,8 @@ def convert_keyword(value):
     Returns:
         value in a JSON/YAML-style.
     """
-    if str(value) in KEYWORDS_CONVERSION:
-        return KEYWORDS_CONVERSION[str(value)]
+    if value is None or isinstance(value, bool):
+        return json.dumps(value)
     return f"'{value}'" if isinstance(value, str) else value
 
 

@@ -2,7 +2,7 @@
 
 # !usr/bin/env/python3
 
-from gendiff.formatters.keywords import KEYWORDS_CONVERSION
+import json
 from typing import Dict
 import types
 
@@ -14,7 +14,7 @@ STATUS_KEYSWORDS = types.MappingProxyType({
 })
 
 
-def convert_keyword(value):
+def stringify_value(value):
     """
     Convert a value from Python- to JSON/YAML-style.
 
@@ -24,8 +24,8 @@ def convert_keyword(value):
     Returns:
         value in a JSON/YAML-style.
     """
-    if str(value) in KEYWORDS_CONVERSION:
-        return KEYWORDS_CONVERSION[str(value)]
+    if value is None or isinstance(value, bool):
+        return json.dumps(value)
     return value
 
 
@@ -41,7 +41,7 @@ def get_lines(value, diff_depth):
         line for a final output.
     """
     if not isinstance(value, Dict):
-        return convert_keyword(value)
+        return stringify_value(value)
     output = ['{']
     tab = INDENT * diff_depth
     ending = f'{tab}}}'
