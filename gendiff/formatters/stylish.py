@@ -56,7 +56,7 @@ def get_lines(value, diff_depth):
     return '\n'.join(output)
 
 
-def get_almost_stylish_output(diff, diff_depth):
+def stringify_samedepth_nodes(diff, diff_depth):
     """
     Get the output in almost stylish format (without outer brackets).
 
@@ -65,7 +65,7 @@ def get_almost_stylish_output(diff, diff_depth):
         diff_depth: depth of a key-value pair inside diff.
 
     Returns:
-        output in an almost stylish format.
+        string representation of a diff at diff_depth.
     """
     output = []
     tab = INDENT * diff_depth
@@ -74,7 +74,7 @@ def get_almost_stylish_output(diff, diff_depth):
         value = status_dict.get('value')
         if type_ == 'nested':
             output_key = f'{tab}{INDENT}{key}: '\
-                f'{{\n{get_almost_stylish_output(value, diff_depth+1)}'
+                f'{{\n{stringify_samedepth_nodes(value, diff_depth+1)}'
             output_value = f'{tab}{INDENT}}}'
             output.extend([output_key, output_value])
         elif type_ == 'changed':
@@ -102,5 +102,9 @@ def format_stylish(diff):
     Returns:
         difference in stylish format.
     """
-    final_output = ['{', get_almost_stylish_output(diff, diff_depth=0), '}']
+    final_output = [
+        '{',
+        stringify_samedepth_nodes(diff, diff_depth=0),
+        '}',
+    ]
     return '\n'.join(final_output)
