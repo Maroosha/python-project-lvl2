@@ -7,8 +7,8 @@ Acceptable file formats: .JSON, .YAML, .YML
 # !/usr/bin/env python3
 
 from typing import Dict
-from gendiff.parser.data_parser import parse
-from gendiff.parser.file_reader import get_raw_data, get_format
+from gendiff.data_getter.data_parser import parse
+from gendiff.data_getter.file_reader import get_raw_data, get_format
 from gendiff.formatters.json import format_json
 from gendiff.formatters.stylish import format_stylish
 from gendiff.formatters.plain import format_plain
