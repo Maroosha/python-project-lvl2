@@ -60,48 +60,13 @@ def get_path(parent, key):
     return f'{key}'
 
 
-def get_logline(status_dict, value, type_, path):
-    """
-    Get a logline.
-
-    Parameters:
-        status_dict: dictionary of types and values
-        for a current (sub)dict,
-        value: given value,
-        type_: type of a key-value pair,
-        path: path to the parameter (key).
-
-    Returns:
-        logline as a list with a single string.
-    """
-    log_line = []
-    if type_ == 'changed':
-        old_value = check_value_complexity(value.get('old value'))
-        new_value = check_value_complexity(value.get('new value'))
-        message = LOG_MESSAGES[type_].format(
-            path=path,
-            old_value=old_value,
-            new_value=new_value,
-        )
-        log_line.append(message)
-    elif type_ == 'added':
-        new_value = check_value_complexity(status_dict.get('value'))
-        message = LOG_MESSAGES[type_].format(path=path, new_value=new_value)
-        log_line.append(message)
-    elif type_ == 'removed':
-        message = LOG_MESSAGES[type_].format(path=path)
-        log_line.append(message)
-    elif type_ == 'nested':
-        log_line.append(get_log(value, path))
-    return log_line
-
-
 def get_log(diff, parent):
     """
     Get a log of messages for plain representation.
 
     Parameters:
-        diff: dictionary of differences btw two files.
+        diff: dictionary of differences btw two files,
+        parent: current parameter.
 
     Returns:
         log for plain representation.
@@ -111,8 +76,24 @@ def get_log(diff, parent):
         path = get_path(parent, key)
         type_ = status_dict.get('type')
         value = status_dict.get('value')
-        logline = get_logline(status_dict, value, type_, path)
-        log.extend(logline)
+        if type_ == 'changed':
+            old_value = check_value_complexity(value.get('old value'))
+            new_value = check_value_complexity(value.get('new value'))
+            message = LOG_MESSAGES[type_].format(
+                path=path,
+                old_value=old_value,
+                new_value=new_value,
+            )
+            log.append(message)
+        elif type_ == 'added':
+            new_value = check_value_complexity(status_dict.get('value'))
+            message = LOG_MESSAGES[type_].format(path=path, new_value=new_value)
+            log.append(message)
+        elif type_ == 'removed':
+            message = LOG_MESSAGES[type_].format(path=path)
+            log.append(message)
+        elif type_ == 'nested':
+            log.append(get_log(value, path))
     return '\n'.join(log)
 
 
