@@ -9,9 +9,7 @@ Acceptable file formats: .JSON, .YAML, .YML
 from typing import Dict
 from gendiff.data_getter.data_parser import parse
 from gendiff.data_getter.file_reader import get_raw_data, get_format
-from gendiff.formatters.json import format_json
-from gendiff.formatters.stylish import format_stylish
-from gendiff.formatters.plain import format_plain
+from gendiff.formatters.formatter import format_diff
 
 
 def get_compared_data(data1, data2):
@@ -85,8 +83,4 @@ def generate_diff(filepath1, filepath2, formatter='stylish'):
     data1 = parse(get_raw_data(filepath1), format1)
     data2 = parse(get_raw_data(filepath2), format2)
     diff = get_compared_data(data1, data2)
-    if formatter == 'plain':
-        return format_plain(diff)
-    if formatter == 'json':
-        return format_json(diff)
-    return format_stylish(diff)
+    return format_diff(diff, formatter)
