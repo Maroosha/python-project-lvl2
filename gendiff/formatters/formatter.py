@@ -19,8 +19,10 @@ def format_diff(diff, formatter):
     Returns:
     difference dict in one of three preferred formats.
     """
-    if formatter == 'plain':
-        return format_plain(diff)
     if formatter == 'json':
         return format_json(diff)
-    return format_stylish(diff)
+    if formatter == 'plain':
+        return format_plain(diff)
+    if formatter == 'stylish':
+        return format_stylish(diff)
+    raise Exception('Invalid format. Try "json", "plain" or "stylish" instead.')
