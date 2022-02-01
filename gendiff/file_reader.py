@@ -25,12 +25,12 @@ def get_raw_data(filepath):
 
 def get_format(filepath):
     """
-    Get file format (JSON or YAML).
+    Get file format.
 
     Parameters:
         filepath: path to the file.
 
     Returns:
-        file format as a string.
+        file format as an uppercase string.
     """
     return Path(filepath).suffix.strip('.').upper()
