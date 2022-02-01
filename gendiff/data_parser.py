@@ -23,6 +23,6 @@ def parse(raw_data, format_):
     """
     if format_ == 'JSON':
         return json.loads(raw_data)
-    if format_ == 'YAML':
+    if format_ in ('YAML', 'YML'):
         return yaml.safe_load(raw_data)
-    raise Exception('Invalid file format.')
+    raise Exception(f'Invalid file format: {format_}.')

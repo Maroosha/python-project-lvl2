@@ -6,6 +6,8 @@ Acceptable file formats: .JSON, .YAML, .YML
 
 # !/usr/bin/env python3
 
+from pathlib import Path
+
 
 def get_raw_data(filepath):
     """
@@ -31,4 +33,4 @@ def get_format(filepath):
     Returns:
         file format as a string.
     """
-    return 'JSON' if filepath[-5:].upper() == '.JSON' else 'YAML'
+    return Path(filepath).suffix.strip('.').upper()
