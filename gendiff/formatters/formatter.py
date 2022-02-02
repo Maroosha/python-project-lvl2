@@ -1,7 +1,5 @@
 "Format a difference dict."
 
-# !/usr/bin/env python3
-
 from gendiff.formatters.json import format_json
 from gendiff.formatters.stylish import format_stylish
 from gendiff.formatters.plain import format_plain

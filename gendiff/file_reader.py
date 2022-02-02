@@ -4,8 +4,6 @@ Read a file.
 Acceptable file formats: .JSON, .YAML, .YML
 """
 
-# !/usr/bin/env python3
-
 from pathlib import Path
 
 

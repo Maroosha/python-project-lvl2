@@ -1,9 +1,4 @@
-"""
-Parse data.
-"""
-
-# !/usr/bin/env python3
-
+"Parse data."
 
 import json
 import yaml

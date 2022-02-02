@@ -1,7 +1,5 @@
 """Stylish formatter for comparing two files."""
 
-# !usr/bin/env/python3
-
 import json
 from typing import Dict
 import types

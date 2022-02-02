@@ -1,7 +1,5 @@
 """Json formatter for comparing two files."""
 
-# !usr/bin/env/python3
-
 import json
 
 

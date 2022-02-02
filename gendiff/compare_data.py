@@ -1,7 +1,5 @@
 "Compare data btw two files."
 
-# !/usr/bin/env python3
-
 from typing import Dict
 
 

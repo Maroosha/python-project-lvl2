@@ -4,8 +4,6 @@ Compare two files with one another.
 Acceptable file formats: .JSON, .YAML, .YML
 """
 
-# !/usr/bin/env python3
-
 from gendiff.compare_data import get_compared_data
 from gendiff.data_parser import parse
 from gendiff.file_reader import get_raw_data, get_format
